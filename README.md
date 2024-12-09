@@ -1,116 +1,143 @@
-# **Video Trimming and Person Tracking Application**
+# 🎥 Video Trimming and Person Tracking Application
 
-This repository contains a robust application for video trimming and person tracking, designed for high efficiency and accuracy. The application leverages cutting-edge deep learning models for face detection, pose estimation, and re-identification (ReID) to process video content and extract frames containing the target individual based on a reference image.
+An advanced application leveraging deep learning for intelligent video processing, face detection, and person tracking. This system automatically identifies and extracts video segments containing a target individual based on a reference image.
+
+## ✨ Key Features
+
+- 👤 **Advanced Face Detection** using Facenet
+- 🎯 **Precise Pose Estimation** with YOLOv8n-pose
+- 🔍 **Smart Re-Identification** using osnet_x1_0
+- ⚡ **Adaptive Frame Skipping** for optimized processing
+- 🐳 **Containerized Architecture** with Docker
+- 🔌 **Full REST API Integration**
+
+## 🚀 Performance Highlights
+
+- ⏱️ Processes 1-hour video in ~22 minutes
+- 📊 95% face matching confidence score
+- 🎯 Intelligent frame retention with minimal false positives
+- 💪 Handles partial occlusion through multi-model approach
+
+## 🛠️ Technical Stack
+
+### Backend
+- Flask framework
+- PyTorch for deep learning
+- OpenCV for video processing
+- Facenet-PyTorch for face embedding
+- Ultralytics for pose estimation
+- TorchReID for person re-identification
+
+### Frontend
+- React Native with Expo
+- Interactive upload interface
+- Real-time processing status
+
+## 🔄 Core Workflow
+
+### Input Processing
+1. Reference image analysis (input_face.png)
+   - Face embedding extraction
+   - Pose keypoint processing
+   - Feature extraction for ReID
+
+2. Video Analysis (input_video.mp4)
+   - Frame-by-frame face detection
+   - Multi-model matching system
+   - Dynamic frame retention
+
+### Output Generation
+- Trimmed video containing target segments (output_trimmed.mp4)
+- Processing statistics and confidence scores
+
+## 💻 System Requirements
+
+- Python 3.10+
+- Node.js 18+
+- Docker
+- NVIDIA GPU (recommended)
+
+## 🏃‍♂️ Quick Start
+
+1. Clone the repository
+```bash
+git clone https://github.com/yourusername/video-trimming-app.git
+cd video-trimming-app
+```
+
+2. Launch containers
+```bash
+docker-compose up --build
+```
+
+3. Access the application
+- Frontend: http://localhost:19000
+- Upload your files:
+  - Video file (input_video.mp4)
+  - Reference image (input_face.png)
+- Retrieve processed video: http://localhost:5000/uploads/output_trimmed.mp4
+
+## 📡 API Reference
+
+### Upload Endpoint
+**POST** `/upload`
+
+Request:
+```json
+{
+  "video": "input_video.mp4",
+  "face": "input_face.png"
+}
+```
+
+Response:
+```json
+{
+  "trimmedVideoUrl": "http://localhost:5000/uploads/output_trimmed.mp4"
+}
+```
+
+## 🔧 Docker Configuration
+
+### Backend
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY . /app
+RUN pip install --no-cache-dir -r requirements.txt
+EXPOSE 5000
+CMD ["flask", "run", "--host=0.0.0.0"]
+```
+
+### Frontend
+```dockerfile
+FROM node:18
+WORKDIR /app
+COPY . /app
+RUN npm install
+RUN npm install -g expo-cli
+EXPOSE 19000 8081
+CMD ["npx", "expo", "start"]
+```
+
+## 📊 Performance Specifications
+
+| Hardware Component | Specification |
+|-------------------|---------------|
+| CPU               | Intel Core i7-12700K |
+| GPU               | NVIDIA RTX 3060 (8GB VRAM) |
+| RAM               | 32GB |
+
+## 🤝 Contributing
+
+We welcome contributions! Please feel free to submit pull requests, create issues, or suggest improvements.
+
+## 📄 License
+
+Released under the MIT License. See LICENSE file for detailed terms.
 
 ---
 
-## **Key Features**
-
-### **1. Face Detection**
-- Uses `Facenet` for face embedding generation to perform highly accurate face matching.
-- Initial face detection is performed using `Haar Cascade`, a lightweight and fast algorithm that ensures efficient processing.
-
-### **2. Pose Estimation**
-- Integrates `YOLOv8n-pose`, a high-performance model for pose estimation.
-- Captures body keypoints to improve tracking accuracy in dynamic environments, even when the face is partially occluded.
-
-### **3. Re-Identification (ReID)**
-- Implements `osnet_x1_0` to extract body features such as clothing details and posture.
-- Ensures the system can differentiate between similar individuals based on additional cues beyond facial features.
-
-### **4. Adaptive Frame Skipping**
-- An intelligent algorithm dynamically skips frames during video processing.
-- Reduces computational load without sacrificing detection quality, enabling faster processing times.
-
-### **5. Dockerized Deployment**
-- Both backend and frontend services are containerized for seamless installation and scalability.
-- Ensures compatibility across different environments with minimal setup.
-
-### **6. Full API Integration**
-- Provides a user-friendly REST API to upload videos and reference images.
-- Outputs the trimmed video containing only the relevant frames with the target individual.
-
----
-
-## **Core Workflow**
-
-### **Input**
-- A **reference image** (`input_face.png`) containing the target individual's face.
-- A **video file** (`input_video.mp4`) to be analyzed.
-
-### **Backend Processing**
-1. **Reference Image Preprocessing**:
-   - Extracts facial embeddings using `Facenet`.
-   - Processes pose keypoints and clothing features for enhanced re-identification.
-
-2. **Video Analysis**:
-   - Detects faces in each frame using `Haar Cascade`.
-   - Matches detected faces with the reference image using cosine similarity.
-   - Performs ReID-based matching using `YOLOv8n-pose` and `osnet_x1_0`.
-
-3. **Frame Matching**:
-   - Retains frames where a match is found with high confidence.
-   - Skips irrelevant segments dynamically, reducing processing time.
-
-### **Output**
-- A **trimmed video** (`output_trimmed.mp4`) containing only the segments with the target individual.
-
----
-
-## **Technical Overview**
-
-### **Backend**
-- **Framework**: Flask
-- **Core Libraries**:
-  - `torch`: For deep learning model inference.
-  - `opencv-python`: For video and image processing.
-  - `facenet-pytorch`: For face embedding generation.
-  - `ultralytics`: For pose estimation.
-  - `torchreid`: For re-identification.
-
-### **Frontend**
-- **Framework**: React Native
-- **Key Features**:
-  - User interface to upload video and reference image.
-  - Displays the trimmed video link upon processing completion.
-
-### **Dockerized Setup**
-- **Backend**: Hosted on `Flask` containerized with Docker.
-- **Frontend**: Expo React Native app containerized with Docker.
-- **Networking**: Containers communicate seamlessly using a bridge network.
-
----
-
-## **Performance**
-
-### **Efficiency**
-- The adaptive frame-skipping mechanism improves video processing speed by reducing redundant computations.
-- A 1-hour video processes in **~22 minutes** on the following setup:
-  - **CPU**: Intel Core i7-12700K
-  - **GPU**: NVIDIA RTX 3060 (8GB VRAM)
-  - **RAM**: 32GB
-
-### **Accuracy**
-- Face matching achieves a **95% confidence score** with minimal false positives.
-- Pose estimation and ReID enhance tracking in challenging scenarios, such as partial occlusion.
-
-### **Results**
-- Processed video retains only relevant segments.
-- Example: A 1.2-hour video with the target individual appearing in 30% of frames resulted in a **30-minute trimmed video**.
-
----
-
-## **Setup Instructions**
-
-### **Prerequisites**
-- **Python**: 3.10 or higher
-- **Node.js**: 18 or higher
-- **Docker**: Installed on the host machine
-- **NVIDIA GPU**: Optional but recommended for faster processing
-
-### **Steps to Run**
-
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/yourusername/video-trimming-app.git
-   cd video-trimming-app
+<div align="center">
+Made with ❤️ for the video processing community
+</div>
