@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./uploads:/app/uploads
+    environment:
+      - FLASK_ENV=development
+    networks:
+      - app-network
+    depends_on:
+      - frontend  # Ensures the frontend service is up before starting backend
+
+  frontend:
+    build:
+      context: ./VideoTrim
+    ports:
+      - "19000:19000"
+      - "8081:8081"
+    environment:
+      - NODE_ENV=development
+    networks:
+      - app-network
+    volumes:
+      - ./VideoTrim:/app  # Optional for live updates in development
+
+networks:
+  app-network:
+    driver: bridge
