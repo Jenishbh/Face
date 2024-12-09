@@ -1,26 +1,27 @@
-# Use an official Node.js runtime as a parent image
-FROM node:18-slim
+# Use official Node.js runtime as the base image
+FROM node:18
 
-# Set the working directory in the container
+# Set the working directory
 WORKDIR /app
 
-# Copy the package.json and package-lock.json first to leverage Docker caching
-COPY package*.json /app/
+# Copy package.json and package-lock.json separately to leverage Docker's layer caching
+COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application files into the container
-COPY . /app
+# Install Expo CLI and @expo/ngrok globally for Expo development and debugging
+RUN npm install -g expo-cli @expo/ngrok
 
-# Install Expo CLI globally
-RUN npm install -g expo-cli
+# Copy the application files
+COPY . .
 
-# Ensure that the `expo-cli` works non-interactively
+# Disable telemetry to avoid unnecessary logs and analytics during builds
+ENV EXPO_NO_TELEMETRY=1
 ENV CI=true
 
-# Make ports 19000, 19001, and 8081 available to the world outside this container
-EXPOSE 19000 19001 8081
+# Expose Expo and Metro bundler ports
+EXPOSE 19000 8081
 
-# Start the Expo CLI
+# Start the Expo development server
 CMD ["npx", "expo", "start", "--tunnel"]
